@@ -2,9 +2,12 @@ import Input from "../lib/Input";
 import ProgramData from "../files/ProgramData";
 import Config from "../files/Config";
 import Crypt from "../lib/Crypt";
+import Menu from "./Menu";
 
 class Initial {
   static async init() {
+    console.clear();
+
     ProgramData.init();
     Config.init();
 
@@ -21,11 +24,16 @@ class Initial {
 
     console.clear();
 
-    const password = await Input.getInput("Enter password", false, true, true);
-    let hash = Crypt.hash(password);
+    const password = await Input.getInput(
+      "Enter password (hidden)",
+      false,
+      true,
+      true
+    );
+    let hash = await Crypt.hash(password);
     Config.write("password", hash);
 
-    console.clear();
+    Menu.init();
 
     return;
   }

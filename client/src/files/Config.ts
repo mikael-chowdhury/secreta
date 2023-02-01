@@ -1,11 +1,13 @@
 import fs from "fs";
 import path from "path";
+import { ServerSchema } from "../lib/Server";
 import ProgramData from "./ProgramData";
 
 interface ConfigSchema {
   name?: string;
   username?: string;
   password?: string;
+  servers?: ServerSchema[];
 }
 
 class Config {

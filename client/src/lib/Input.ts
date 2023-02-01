@@ -22,6 +22,7 @@ class Input {
     if (!silent) {
       return new Promise((res, rej) => {
         process.stdin.on("data", (chunk) => {
+          process.stdin.removeAllListeners();
           res(chunk.toString().trim());
         });
       });
@@ -38,6 +39,7 @@ class Input {
             case "\r":
             case "\u0004":
               process.stdin.setRawMode(false);
+              process.stdin.removeAllListeners();
               res(response);
               break;
 
