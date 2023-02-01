@@ -7,7 +7,7 @@ interface ServerSchema {
 }
 
 class Server {
-  public static connect(ip: string) {
+  public static connect(ip: string): Promise<ws> {
     return new Promise((res, rej) => {
       const client = new ws.WebSocket("ws://localhost:8080/");
 
@@ -21,7 +21,7 @@ class Server {
 
       client.on("open", () => {
         res(client);
-        console.log(colors.green("connected to server"));
+        console.log(colors.bold(colors.green("< connected to server >")));
       });
     });
   }

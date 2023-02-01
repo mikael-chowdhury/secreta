@@ -1,4 +1,5 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
+import Config from "../files/Config";
 
 class Crypt {
   static hash(password: string): Promise<Error | string> {
@@ -12,6 +13,11 @@ class Crypt {
         });
       });
     });
+  }
+
+  static validPassword(password: string): boolean {
+    console.log("\n", password, Config.ConfigObject.password);
+    return bcrypt.compareSync(password, Config.ConfigObject.password as string);
   }
 }
 

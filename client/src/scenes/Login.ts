@@ -2,7 +2,7 @@ import Config from "../files/Config";
 import ProgramData from "../files/ProgramData";
 import Input from "../lib/Input";
 import Menu from "./Menu";
-import bcrypt from "bcrypt";
+import Crypt from "../lib/Crypt";
 
 class Login {
   static async init() {
@@ -18,9 +18,7 @@ class Login {
         true,
         true
       );
-      if (
-        bcrypt.compareSync(password, Config.ConfigObject.password as string)
-      ) {
+      if (Crypt.validPassword(password)) {
         Menu.init();
       } else {
         console.log("\nIncorrect Password\n");

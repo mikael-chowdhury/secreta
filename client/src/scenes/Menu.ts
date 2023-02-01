@@ -2,6 +2,10 @@ import Config from "../files/Config";
 import Input from "../lib/Input";
 import Server from "../lib/Server";
 import colors from "colors";
+import Payload from "../lib/Payload";
+import { ServerEventPayload } from "../lib/ServerEvent";
+import { ClientEvent, ClientEventPayload } from "../lib/ClientEvent";
+import { IUser } from "../lib/User";
 
 class Menu {
   static async init() {
@@ -17,7 +21,7 @@ class Menu {
 
       const option = await Input.getInput(
         "Select one of the following:\n1. Server List\n2. Join Server\n3. Enter Chatroom",
-        false,
+        true,
         false,
         false
       );
@@ -44,7 +48,14 @@ class Menu {
             if (ip.trim() == "") {
               Menu.init();
             } else {
-              Server.connect(ip);
+              const ws = await Server.connect(ip);
+
+              ws.send(
+                ClientEventPayload.toBuffer({
+                  event: ClientEvent.JOINEVENT,
+                  data: { username: Config.ConfigObject.username } as IUser,
+                })
+              );
 
               console.log(
                 colors.green(
@@ -55,6 +66,27 @@ class Menu {
 
               process.stdin.on("data", (chunk) => {
                 const msg = chunk.toString();
+                ws.send(
+                  Payload.toBuffer({
+                    author: Config.ConfigObject.username as string,
+                    message: msg.trim(),
+                  })
+                );
+              });
+
+              ws.on("message", (data) => {
+                const serverEvent = ServerEventPayload.fromBuffer(
+                  Buffer.from(data.toString())
+                );
+
+                if (serverEvent.author != Config.ConfigObject.username) {
+                  console.log(
+                    colors.cyan(
+                      colors.bold(serverEvent.author + " -> ") +
+                        serverEvent.message
+                    )
+                  );
+                }
               });
             }
 
