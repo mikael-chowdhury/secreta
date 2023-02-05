@@ -9,7 +9,7 @@ interface ServerSchema {
 class Server {
   public static connect(ip: string): Promise<ws> {
     return new Promise((res, rej) => {
-      const client = new ws.WebSocket("ws://localhost:8080/");
+      const client = new ws.WebSocket(ip);
 
       client.on("error", (err) => {
         console.error(err);

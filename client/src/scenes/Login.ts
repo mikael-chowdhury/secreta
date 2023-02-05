@@ -8,9 +8,6 @@ class Login {
   static async init() {
     console.clear();
 
-    console.log(ProgramData.FOLDER);
-    console.log(Config.ConfigObject.username);
-
     async function passwordLoop() {
       const password = await Input.getInput(
         "Password (hidden)",

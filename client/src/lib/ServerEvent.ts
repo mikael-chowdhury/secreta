@@ -13,7 +13,7 @@ class ServerEventPayload {
     return Buffer.from(JSON.stringify(payload));
   }
 
-  static fromBuffer(buffer: Buffer) {
+  static fromBuffer(buffer: Buffer): IServerEventPayload {
     return JSON.parse(buffer.toString());
   }
 }

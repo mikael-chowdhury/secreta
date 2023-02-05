@@ -2,10 +2,11 @@ import Config from "../files/Config";
 import Input from "../lib/Input";
 import Server from "../lib/Server";
 import colors from "colors";
-import Payload from "../lib/Payload";
-import { ServerEventPayload } from "../lib/ServerEvent";
+import Payload, { IPayload } from "../lib/Payload";
+import { ServerEvent, ServerEventPayload } from "../lib/ServerEvent";
 import { ClientEvent, ClientEventPayload } from "../lib/ClientEvent";
 import { IUser } from "../lib/User";
+import CredentialMenu from "./CredentialMenu";
 
 class Menu {
   static async init() {
@@ -20,7 +21,7 @@ class Menu {
       `);
 
       const option = await Input.getInput(
-        "Select one of the following:\n1. Server List\n2. Join Server\n3. Enter Chatroom",
+        "Select one of the following:\n1. Join Server\n2. Logout\n",
         true,
         false,
         false
@@ -33,11 +34,6 @@ class Menu {
       ) {
         switch (parseInt(option)) {
           case 1:
-            Config.ConfigObject.servers?.forEach((server, index) => {
-              console.log(index + 1 + ". " + server.name);
-            });
-            break;
-          case 2:
             const ip = await Input.getInput(
               "IP-Address of the server (press enter if you want to go back)",
               false,
@@ -48,6 +44,7 @@ class Menu {
             if (ip.trim() == "") {
               Menu.init();
             } else {
+              console.clear();
               const ws = await Server.connect(ip);
 
               ws.send(
@@ -79,17 +76,38 @@ class Menu {
                   Buffer.from(data.toString())
                 );
 
-                if (serverEvent.author != Config.ConfigObject.username) {
-                  console.log(
-                    colors.cyan(
-                      colors.bold(serverEvent.author + " -> ") +
-                        serverEvent.message
-                    )
-                  );
+                if ("event" in serverEvent) {
+                  if (serverEvent.event == ServerEvent.USERJOINEVENT) {
+                    const user = serverEvent.data as IUser;
+                    console.log(
+                      colors.bold(
+                        colors.green(`< ${user.username} JOINED THE CHAT >`)
+                      )
+                    );
+                  } else if (serverEvent.event == ServerEvent.USERLEAVEEVENT) {
+                    const user = serverEvent.data as IUser;
+                    console.log(
+                      colors.bold(
+                        colors.red(`< ${user.username} LEFT THE CHAT >`)
+                      )
+                    );
+                  }
+                } else {
+                  const event = serverEvent as unknown as IPayload;
+                  if (event.author != Config.ConfigObject.username) {
+                    console.log(
+                      colors.cyan(
+                        colors.bold(event.author + " -> ") + event.message
+                      )
+                    );
+                  }
                 }
               });
             }
 
+            break;
+          case 2:
+            CredentialMenu.init();
             break;
         }
       } else {

@@ -13,21 +13,30 @@ interface ConfigSchema {
 class Config {
   static FILE = path.join(ProgramData.FOLDER, "config.json");
   static ConfigObject: ConfigSchema = {};
+  static AbsConfigObject: ConfigSchema = {};
 
   static init() {
     fs.writeFileSync(Config.FILE, "{}");
-    Config.ConfigObject = {};
+    Config.AbsConfigObject = {};
   }
 
   static load() {
-    Config.ConfigObject = JSON.parse(fs.readFileSync(Config.FILE).toString());
+    Config.AbsConfigObject = JSON.parse(
+      fs.readFileSync(Config.FILE).toString()
+    );
+
+    Config.ConfigObject = Config.AbsConfigObject;
   }
 
   static updateFile() {
-    fs.writeFileSync(Config.FILE, JSON.stringify(this.ConfigObject, null, 4));
+    fs.writeFileSync(
+      Config.FILE,
+      JSON.stringify(this.AbsConfigObject, null, 4)
+    );
   }
 
   static write(key: keyof ConfigSchema, value: any) {
+    Config.AbsConfigObject[key] = value;
     Config.ConfigObject[key] = value;
     Config.updateFile();
   }
